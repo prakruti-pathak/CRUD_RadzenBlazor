@@ -1,0 +1,85 @@
+﻿@page "/editcar"
+@using CRUDRadzenBlazor.Models
+@using CRUDRadzenBlazor.Services
+
+
+@inject ICarService CarService
+@inject Radzen.DialogService DialogService
+
+<EditForm Model="@CarService" OnValidSubmit="SaveCar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    @if (!string.IsNullOrEmpty(ServiceMessage))
+    {
+        <div class="text-danger mb-3">@ServiceMessage</div>
+    }
+    <div class="form-group">
+        <label for="make" class="form-label">Make:</label>
+        <InputText id="make" @bind-Value="Car.Make" class="form-control" />
+        <ValidationMessage For="@(() => Car.Make)" />
+    </div>
+
+    <div class="form-group">
+        <label for="model" class="form-label">Model:</label>
+        <InputText id="model" @bind-Value="Car.Model" class="form-control" />
+        <ValidationMessage For="@(() => Car.Model)" />
+    </div>
+
+    <div class="form-group">
+        <label for="year" class="form-label">Year:</label>
+        <InputNumber id="year" @bind-Value="Car.Year" class="form-control" />
+        <ValidationMessage For="@(() => Car.Year)" />
+    </div>
+
+    <div class="form-group">
+        <label for="price" class="form-label">Price:</label>
+        <InputNumber id="price" @bind-Value="Car.Price" class="form-control" />
+        <ValidationMessage For="@(() => Car.Price)" />
+    </div>
+
+    <div class="form-group">
+        <label for="engine" class="form-label">Engine:</label>
+        <InputText id="engine" @bind-Value="Car.Engine" class="form-control" />
+        <ValidationMessage For="@(() => Car.Engine)" />
+    </div>
+
+    <div class="form-group">
+        <label for="color" class="form-label">Color:</label>
+        <InputText id="color" @bind-Value="Car.Color" class="form-control" />
+        <ValidationMessage For="@(() => Car.Color)" />
+    </div>
+
+
+    <div class="d-flex justify-content-between mt-4">
+        <RadzenButton type="submit" class="btn btn-primary">Save</RadzenButton>
+        <RadzenButton ButtonType="ButtonType.Button" Icon="close" Click="CloseDialog" class="btn btn-secondary">Cancel</RadzenButton>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public Car? Car { get; set; }
+    public string? ServiceMessage { get; set; }
+    private async Task SaveCar()
+    {
+        if (Car != null)
+        {
+            try
+            {
+                await CarService.UpdateCarAsync(Car);
+                DialogService.Close(true);
+            }
+            catch (Exception ex)
+            {
+                DialogService.Close(false);
+                Console.WriteLine("Something unexpected happened.");
+                ServiceMessage = ex.Message;
+            }
+
+        }
+    }
+    private void CloseDialog()
+    {
+        DialogService.Close(false);
+    }
+
+}

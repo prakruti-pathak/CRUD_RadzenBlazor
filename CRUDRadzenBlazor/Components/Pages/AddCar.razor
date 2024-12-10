@@ -1,0 +1,81 @@
+﻿@page "/addcar"
+
+@using CRUDRadzenBlazor.Models
+@using CRUDRadzenBlazor.Services
+
+@inject ICarService CarService
+@inject Radzen.DialogService DialogService
+
+<EditForm Model="@Car" OnValidSubmit="AddNewCar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    @if (!string.IsNullOrEmpty(ServiceMessage))
+    {
+        <div class="text-danger mb-3">@ServiceMessage</div>
+    }
+
+    <div class="form-group">
+        <label for="make" class="form-label">Make:</label>
+        <InputText id="make" @bind-Value="Car.Make" class="form-control" />
+        <ValidationMessage For="@(() => Car.Make)" />
+    </div>
+
+    <div class="form-group">
+        <label for="model" class="form-label">Model:</label>
+        <InputText id="model" @bind-Value="Car.Model" class="form-control" />
+        <ValidationMessage For="@(() => Car.Model)" />
+    </div>
+
+    <div class="form-group">
+        <label for="year" class="form-label">Year:</label>
+        <InputNumber id="year" @bind-Value="Car.Year" class="form-control" />
+        <ValidationMessage For="@(() => Car.Year)" />
+    </div>
+
+    <div class="form-group">
+        <label for="price" class="form-label">Price:</label>
+        <InputNumber id="price" @bind-Value="Car.Price" class="form-control" />
+        <ValidationMessage For="@(() => Car.Price)" />
+    </div>
+
+    <div class="form-group">
+        <label for="engine" class="form-label">Engine:</label>
+        <InputText id="engine" @bind-Value="Car.Engine" class="form-control" />
+        <ValidationMessage For="@(() => Car.Engine)" />
+    </div>
+
+    <div class="form-group">
+        <label for="color" class="form-label">Color:</label>
+        <InputText id="color" @bind-Value="Car.Color" class="form-control" />
+        <ValidationMessage For="@(() => Car.Color)" />
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <RadzenButton type="submit" class="btn btn-primary">Create</RadzenButton>
+        <RadzenButton ButtonType="ButtonType.Button" Click="CloseDialog" class="btn btn-secondary">Close</RadzenButton>
+    </div>
+</EditForm>
+
+@code {
+    public Car Car { get; set; } = new Car();
+    public string? ServiceMessage { get; set; } // For error messages from service
+
+    private async Task AddNewCar()
+    {
+        try
+        {
+            await CarService.AddCarAsync(Car);
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            ServiceMessage = ex.Message; // Set service error message
+        }
+    }
+
+    private void CloseDialog()
+    {
+        DialogService.Close(false);
+    }
+}

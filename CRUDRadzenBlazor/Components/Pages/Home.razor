@@ -1,0 +1,102 @@
+﻿@page "/"
+@using CRUDRadzenBlazor.Services
+@using CRUDRadzenBlazor.Models
+@inject ICarService CarService
+@inject DialogService DialogService
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<!-- Main Content Wrapper -->
+<div class="d-flex justify-content-center min-vh-100 mt-4">
+    <div class="container text-center">
+        <h1 class="fw-bold mb-4">My Car Inventory</h1>
+        <RadzenButton Click="AddCar" class="mb-4" Icon="add" Style="font-size: 16px;">Add Car</RadzenButton>
+
+        <!-- Card Container -->
+        <div class="card p-4 shadow-lg">
+            @if (cars == null || !cars.Any())
+            {
+                <h3 class="alert alert-danger">No cars found!</h3>
+            }
+            else
+            {
+                <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true"
+                                AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                                ShowPagingSummary="true" Data="@cars" TItem="Car" LogicalFilterOperator="LogicalFilterOperator.Or"
+                                SelectionMode="DataGridSelectionMode.Single">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Car" Property="Make" Filterable="true" Title="Make" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Model" Filterable="true" Title="Model" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Year" Filterable="true" Title="Year" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Price" Filterable="true" Title="Price" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Engine" Filterable="true" Title="Engine" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Color" Filterable="true" Title="Color" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Title="Actions">
+                            <Template Context="data">
+                                <RadzenButton Click="@(args => EditCar(data))" Icon="edit" ButtonStyle="ButtonStyle.Info" />
+                                <RadzenButton Click="@(args => DeleteCar(data))" Icon="delete"  ButtonStyle="ButtonStyle.Danger" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    IEnumerable<Car>? cars;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cars = await GetAllCarsForGrid();
+    }
+
+    private async Task<IEnumerable<Car>> GetAllCarsForGrid()
+    {
+        return await CarService.GetAllAsync();
+    }
+
+    private async void EditCar(Car car)
+    {
+        var parameters = new Dictionary<string, object>() { { "Car", car } };
+        var options = new Radzen.DialogOptions() { CssClass = "custom-dialog" };
+        var result = await DialogService.OpenAsync<EditCar>("Edit Car", parameters, options);
+        if (result == true)
+        {
+            await RefreshCars();
+        }
+        else
+        {
+            Console.WriteLine($"Failed to update the car with ID: {car.Id}.");
+        }
+    }
+
+    private async void DeleteCar(Car car)
+    {
+        bool? confirmed = await DialogService.Confirm("Are you sure you want to delete this car?", "Delete Car");
+
+        if (confirmed == true)
+        {
+            await CarService.DeleteCarAsync(car.Id);
+            await RefreshCars();
+        }
+    }
+
+    private async void AddCar()
+    {
+        var options = new Radzen.DialogOptions() { CssClass = "custom-dialog" };
+        var result = await DialogService.OpenAsync<AddCar>("Add Car", null, options);
+        if (result == true)
+        {
+            await RefreshCars();
+        }
+    }
+
+    private async Task RefreshCars()
+    {
+        cars = await GetAllCarsForGrid();
+        StateHasChanged(); //Notify the thing is updated
+    }
+}
