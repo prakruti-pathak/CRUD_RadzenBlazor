@@ -16,7 +16,7 @@ namespace CRUDRadzenBlazor.Models
         [MaxLength(50)]
         public string Model { get; set; }
         [Required(ErrorMessage = "Year is required.")]
-        [Range(1900, 2025, ErrorMessage = "Year must be between 1900 and 2100.")]
+        [Range(1900, 2025, ErrorMessage = "Year must be between 1900 and 2025.")]
         public int Year { get; set; }
         [Required(ErrorMessage = "Price is required.")]
         [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive number.")]

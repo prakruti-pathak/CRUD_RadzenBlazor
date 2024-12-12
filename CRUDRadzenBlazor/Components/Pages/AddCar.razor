@@ -8,7 +8,6 @@
 
 <EditForm Model="@Car" OnValidSubmit="AddNewCar">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
     @if (!string.IsNullOrEmpty(ServiceMessage))
     {
@@ -59,7 +58,7 @@
 
 @code {
     public Car Car { get; set; } = new Car();
-    public string? ServiceMessage { get; set; } // For error messages from service
+    public string? ServiceMessage { get; set; } 
 
     private async Task AddNewCar()
     {
@@ -70,7 +69,7 @@
         }
         catch (Exception ex)
         {
-            ServiceMessage = ex.Message; // Set service error message
+            ServiceMessage = ex.Message; 
         }
     }
 

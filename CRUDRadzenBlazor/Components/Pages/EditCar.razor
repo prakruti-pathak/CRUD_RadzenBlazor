@@ -8,7 +8,6 @@
 
 <EditForm Model="@CarService" OnValidSubmit="SaveCar">
     <DataAnnotationsValidator />
-    <ValidationSummary />
     @if (!string.IsNullOrEmpty(ServiceMessage))
     {
         <div class="text-danger mb-3">@ServiceMessage</div>

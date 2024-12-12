@@ -7,11 +7,25 @@ namespace CRUDRadzenBlazor.Services
     {
         public async Task<IEnumerable<Car>> GetAllAsync()
         {
-            return await carRepository.GetAllCarAsync();
+            try
+            {
+                return await carRepository.GetAllCarAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving all cars: {ex.Message}", ex);
+            }
         }
         public async Task<Car> GetByIdAsync(int id)
         {
-            return await carRepository.GetCarByIdAsync(id);
+            try
+            {
+                return await carRepository.GetCarByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving car with ID {id}: {ex.Message}", ex);
+            }
         }
         public async Task UpdateCarAsync(Car car)
         {
@@ -39,7 +53,13 @@ namespace CRUDRadzenBlazor.Services
 
         public async Task DeleteCarAsync(int id)
         {
-            await carRepository.DeleteCarAsync(id);
+            try
+            {
+                await carRepository.DeleteCarAsync(id);
+            }
+            catch (Exception ex) {
+                throw new Exception($"Error deleting car with ID {id}: {ex.Message}", ex);
+            }
         }
     }
 }
