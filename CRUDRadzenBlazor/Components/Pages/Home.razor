@@ -27,10 +27,10 @@
                     <Columns>
                         <RadzenDataGridColumn TItem="Car" Property="Make" Filterable="true" Title="Make" TextAlign="TextAlign.Center" />
                         <RadzenDataGridColumn TItem="Car" Property="Model" Filterable="true" Title="Model" TextAlign="TextAlign.Center" />
-                        <RadzenDataGridColumn TItem="Car" Property="Year" Filterable="true" Title="Year" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Year.YearName" Filterable="true" Title="Year" TextAlign="TextAlign.Center" />
                         <RadzenDataGridColumn TItem="Car" Property="Price" Filterable="true" Title="Price" TextAlign="TextAlign.Center" />
                         <RadzenDataGridColumn TItem="Car" Property="Engine" Filterable="true" Title="Engine" TextAlign="TextAlign.Center" />
-                        <RadzenDataGridColumn TItem="Car" Property="Color" Filterable="true" Title="Color" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn TItem="Car" Property="Color.ColorName" Filterable="true" Title="Color" TextAlign="TextAlign.Center" />
                         <RadzenDataGridColumn TItem="Car" Title="Actions">
                             <Template Context="data">
                                 <RadzenButton Click="@(args => EditCar(data))" Icon="edit" ButtonStyle="ButtonStyle.Info" />

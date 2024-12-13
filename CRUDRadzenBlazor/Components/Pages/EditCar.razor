@@ -6,48 +6,56 @@
 @inject ICarService CarService
 @inject Radzen.DialogService DialogService
 
-<EditForm Model="@CarService" OnValidSubmit="SaveCar">
+<EditForm Model="@Car" OnValidSubmit="SaveCar">
     <DataAnnotationsValidator />
     @if (!string.IsNullOrEmpty(ServiceMessage))
     {
         <div class="text-danger mb-3">@ServiceMessage</div>
     }
-    <div class="form-group">
-        <label for="make" class="form-label">Make:</label>
-        <InputText id="make" @bind-Value="Car.Make" class="form-control" />
-        <ValidationMessage For="@(() => Car.Make)" />
-    </div>
+    <div class="form-row d-flex">
+        <div class="form-group col-md-6">
+            <label for="make" class="form-label">Make:</label>
+            <InputText id="make" @bind-Value="Car.Make" class="form-control" />
+            <ValidationMessage For="@(() => Car.Make)" />
+        </div>
 
-    <div class="form-group">
-        <label for="model" class="form-label">Model:</label>
-        <InputText id="model" @bind-Value="Car.Model" class="form-control" />
-        <ValidationMessage For="@(() => Car.Model)" />
+        <div class="form-group col-md-6">
+            <label for="model" class="form-label">Model:</label>
+            <InputText id="model" @bind-Value="Car.Model" class="form-control" />
+            <ValidationMessage For="@(() => Car.Model)" />
+        </div>
     </div>
-
-    <div class="form-group">
+  <div class="form-row d-flex">
+       <div class="form-group col-md-6">
         <label for="year" class="form-label">Year:</label>
-        <InputNumber id="year" @bind-Value="Car.Year" class="form-control" />
-        <ValidationMessage For="@(() => Car.Year)" />
+        <RadzenDropDown @bind-Value="@Car.YearId" Data="@Years" TextProperty="YearName" ValueProperty="YearId" class="form-control" />
+        <ValidationMessage For="@(() => Car.YearId)" />
     </div>
 
-    <div class="form-group">
+        <div class="form-group col-md-6" >
         <label for="price" class="form-label">Price:</label>
         <InputNumber id="price" @bind-Value="Car.Price" class="form-control" />
         <ValidationMessage For="@(() => Car.Price)" />
     </div>
+    </div>
 
-    <div class="form-group">
+     <div class="form-row d-flex">
+    <div class="form-group col-md-6">
         <label for="engine" class="form-label">Engine:</label>
         <InputText id="engine" @bind-Value="Car.Engine" class="form-control" />
         <ValidationMessage For="@(() => Car.Engine)" />
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-md-6">
         <label for="color" class="form-label">Color:</label>
-        <InputText id="color" @bind-Value="Car.Color" class="form-control" />
-        <ValidationMessage For="@(() => Car.Color)" />
+        <RadzenDropDown @bind-Value="Car.ColorId"
+                        Data="@Colors"
+                        TextProperty="ColorName"
+                        ValueProperty="ColorId"
+                            class="form-control" />
+        <ValidationMessage For="@(() => Car.ColorId)" />
     </div>
-
+    </div>
 
     <div class="d-flex justify-content-between mt-4">
         <RadzenButton type="submit" class="btn btn-primary">Save</RadzenButton>
@@ -74,6 +82,26 @@
                 ServiceMessage = ex.Message;
             }
 
+        }
+    }
+    private IEnumerable<Color> Colors { get; set; }
+    private int ColorId { get; set; }
+    private IEnumerable<Year> Years { get; set; }
+    private int YearId { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Colors = await CarService.GetAllColorsAsync();
+        if (Colors.Any())
+        {
+            ColorId = Colors.First().ColorId; ;
+        }
+        Years = await CarService.GetAllYearsAsync();
+
+        if (Years.Any())
+        {
+            YearId = Years.First().YearId; ;
         }
     }
     private void CloseDialog()

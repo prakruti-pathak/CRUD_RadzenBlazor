@@ -10,7 +10,7 @@ namespace CRUDRadzenBlazor.Repositories
         {
             try
             {
-                return await appDbContext.Cars.ToListAsync();
+                return await appDbContext.Cars.Include(c => c.Color).Include(c => c.Year).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -23,7 +23,9 @@ namespace CRUDRadzenBlazor.Repositories
         {
             try
             {
-                return await appDbContext.Cars.FirstOrDefaultAsync(c => c.Id == id);
+                return await appDbContext.Cars.Include(c => c.Year)  
+        .Include(c => c.Color)
+        .FirstOrDefaultAsync(c => c.Id == id);
             }
             catch (Exception ex)
             {
@@ -51,13 +53,26 @@ namespace CRUDRadzenBlazor.Repositories
 
         public async Task UpdateCarAsync(Car car)
         {
+            if (car == null)
+            {
+                throw new ArgumentNullException(nameof(car), "Car cannot be null.");
+            }
+
             try
             {
-                if (car != null)
+                var trackedCar = appDbContext.Cars.Local.FirstOrDefault(c => c.Id == car.Id);
+                if (trackedCar != null)
                 {
-                    appDbContext.Cars.Update(car);
-                    await appDbContext.SaveChangesAsync();
+                    appDbContext.Entry(trackedCar).CurrentValues.SetValues(car);
                 }
+                else
+                {
+
+                    appDbContext.Cars.Attach(car);
+                    appDbContext.Entry(car).State = EntityState.Modified;
+                }
+
+                await appDbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -65,6 +80,7 @@ namespace CRUDRadzenBlazor.Repositories
                 throw;
             }
         }
+
 
         public async Task DeleteCarAsync(int id)
         {
@@ -91,13 +107,23 @@ namespace CRUDRadzenBlazor.Repositories
                 return await appDbContext.Cars.AnyAsync(c =>
                     c.Make.ToLower() == make.ToLower() &&
                     c.Model.ToLower() == model.ToLower() &&
-                    c.Year == year);
+                    c.YearId == year
+                    );
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error checking if car exists: {ex.Message}");
                 throw;
             }
+        }
+
+        public async Task<IEnumerable<Color>>  GetAllColors()
+        {
+            return await appDbContext.Colors.ToListAsync();
+        }
+        public async Task<IEnumerable<Year>> GetAllYears()
+        {
+            return await appDbContext.Years.ToListAsync();
         }
 
     }

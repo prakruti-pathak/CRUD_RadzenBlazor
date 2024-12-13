@@ -15,18 +15,22 @@ namespace CRUDRadzenBlazor.Models
         [Required(ErrorMessage = "Model is required.")]
         [MaxLength(50)]
         public string Model { get; set; }
-        [Required(ErrorMessage = "Year is required.")]
-        [Range(1900, 2025, ErrorMessage = "Year must be between 1900 and 2025.")]
-        public int Year { get; set; }
+       
         [Required(ErrorMessage = "Price is required.")]
-        [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive number.")]
+        [Range(50000, 5000000, ErrorMessage = "Price must be a between 50000 and 5000000")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
         [Required(ErrorMessage = "Engine is required.")]
         [MaxLength(50)]
         public string Engine { get; set; }
+
+
         [Required(ErrorMessage = "Color is required.")]
-        [MaxLength(50)]
-        public string Color { get; set; }
+        public int ColorId { get; set; }
+        public Color Color { get; set; }
+        [Required(ErrorMessage = "Year is required.")]
+        public int YearId {  get; set; }
+        public Year Year { get; set; }
+
     }
 }

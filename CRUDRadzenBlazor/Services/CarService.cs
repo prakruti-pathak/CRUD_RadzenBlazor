@@ -9,13 +9,41 @@ namespace CRUDRadzenBlazor.Services
         {
             try
             {
-                return await carRepository.GetAllCarAsync();
+                var carData = await carRepository.GetAllCarAsync();
+                var cars = new List<Car>();
+
+                foreach (var item in carData)
+                {
+                    var car = new Car
+                    {
+                        Id = item.Id,
+                        Make = item.Make,
+                        Model = item.Model,
+                        YearId = item.YearId,
+                        ColorId = item.ColorId,
+                        Engine=item.Engine,
+                        Price = item.Price,
+                        Year = new Year
+                        {
+                            YearId = item.YearId,
+                            YearName = item.Year.YearName
+                        },
+                        Color = new Color
+                        {
+                            ColorId = item.ColorId,
+                            ColorName = item.Color.ColorName
+                        }
+                    };
+                    cars.Add(car);
+                }
+                return cars;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error retrieving all cars: {ex.Message}", ex);
             }
         }
+
         public async Task<Car> GetByIdAsync(int id)
         {
             try
@@ -43,7 +71,7 @@ namespace CRUDRadzenBlazor.Services
             {
                 throw new ArgumentNullException(nameof(car), "Car cannot be null.");
             }
-            if (await carRepository.CarExistsAsync(car.Make, car.Model,car.Year))
+            if (await carRepository.CarExistsAsync(car.Make, car.Model,car.YearId))
             {
                 throw new InvalidOperationException($"A car with Make '{car.Make}' and Model '{car.Model}' already exists.");
             }
@@ -59,6 +87,29 @@ namespace CRUDRadzenBlazor.Services
             }
             catch (Exception ex) {
                 throw new Exception($"Error deleting car with ID {id}: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<IEnumerable<Color>> GetAllColorsAsync()
+        {
+            try
+            {
+                return await carRepository.GetAllColors();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving all colors: {ex.Message}", ex);
+            }
+        }
+        public async Task<IEnumerable<Year>> GetAllYearsAsync()
+        {
+            try
+            {
+                return await carRepository.GetAllYears();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving all years: {ex.Message}", ex);
             }
         }
     }

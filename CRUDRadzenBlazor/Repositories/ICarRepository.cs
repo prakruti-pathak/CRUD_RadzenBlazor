@@ -10,5 +10,7 @@ namespace CRUDRadzenBlazor.Repositories
         Task<Car?> GetCarByIdAsync(int id);
         Task UpdateCarAsync(Car car);
         Task<bool> CarExistsAsync(string make, string model, int year);
+        Task<IEnumerable<Year>> GetAllYears();
+        Task<IEnumerable<Color>> GetAllColors();
     }
 }
