@@ -6,11 +6,19 @@ namespace CRUDRadzenBlazor.Repositories
 {
     public class CarRepository(AppDbContext appDbContext):ICarRepository
     {
-        public async Task<IEnumerable<Car>> GetAllCarAsync()
+        public async Task<IEnumerable<Car>> GetAllCarAsync(string searchQuery = "")
         {
             try
             {
-                return await appDbContext.Cars.Include(c => c.Color).Include(c => c.Year).ToListAsync();
+                var query = appDbContext.Cars.Include(c => c.Color).Include(c => c.Year).AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    query = query.Where(c => c.Make.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                              c.Engine.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+                }
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -18,6 +26,7 @@ namespace CRUDRadzenBlazor.Repositories
                 throw;
             }
         }
+
 
         public async Task<Car?> GetCarByIdAsync(int id)
         {

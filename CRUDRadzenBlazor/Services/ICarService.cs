@@ -6,7 +6,7 @@ namespace CRUDRadzenBlazor.Services
     {
         Task AddCarAsync(Car car);
         Task DeleteCarAsync(int id);
-        Task<IEnumerable<Car>> GetAllAsync();
+        Task<IEnumerable<Car>> GetAllAsync(string searchQuery = "");
         Task<IEnumerable<Color>> GetAllColorsAsync();
         Task<IEnumerable<Year>> GetAllYearsAsync();
         Task<Car> GetByIdAsync(int id);

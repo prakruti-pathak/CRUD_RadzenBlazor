@@ -5,11 +5,13 @@ namespace CRUDRadzenBlazor.Services
 {
     public class CarService(ICarRepository carRepository):ICarService
     {
-        public async Task<IEnumerable<Car>> GetAllAsync()
+        public async Task<IEnumerable<Car>> GetAllAsync(string searchQuery = "")
         {
             try
             {
-                var carData = await carRepository.GetAllCarAsync();
+                // Use the searchQuery to filter by Make or Engine
+                var carData = await carRepository.GetAllCarAsync(searchQuery);
+
                 var cars = new List<Car>();
 
                 foreach (var item in carData)
@@ -21,7 +23,7 @@ namespace CRUDRadzenBlazor.Services
                         Model = item.Model,
                         YearId = item.YearId,
                         ColorId = item.ColorId,
-                        Engine=item.Engine,
+                        Engine = item.Engine,
                         Price = item.Price,
                         Year = new Year
                         {
@@ -36,6 +38,7 @@ namespace CRUDRadzenBlazor.Services
                     };
                     cars.Add(car);
                 }
+
                 return cars;
             }
             catch (Exception ex)
@@ -43,6 +46,7 @@ namespace CRUDRadzenBlazor.Services
                 throw new Exception($"Error retrieving all cars: {ex.Message}", ex);
             }
         }
+
 
         public async Task<Car> GetByIdAsync(int id)
         {

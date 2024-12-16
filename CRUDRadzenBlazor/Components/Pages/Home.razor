@@ -13,6 +13,10 @@
         <h1 class="fw-bold mb-4">My Car Inventory</h1>
         <RadzenButton Click="AddCar" class="mb-4" Icon="add">Add Car</RadzenButton>
 
+        <div class="mb-4">
+            <RadzenTextBox @bind-Value="searchText" Placeholder="Search by Make or Engine..." Change="OnSearchChanged"  />
+        </div>
+
         <div class="card p-4 shadow-lg">
             @if (cars == null || !cars.Any())
             {
@@ -22,7 +26,7 @@
             {
                 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true"
                                 AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
-                                ShowPagingSummary="true" Data="@cars" TItem="Car" LogicalFilterOperator="LogicalFilterOperator.Or"
+                                ShowPagingSummary="true" Data="@filteredCars" TItem="Car" LogicalFilterOperator="LogicalFilterOperator.Or"
                                 SelectionMode="DataGridSelectionMode.Single">
                     <Columns>
                         <RadzenDataGridColumn TItem="Car" Property="Make" Filterable="true" Title="Make" TextAlign="TextAlign.Center" />
@@ -34,7 +38,7 @@
                         <RadzenDataGridColumn TItem="Car" Title="Actions">
                             <Template Context="data">
                                 <RadzenButton Click="@(args => EditCar(data))" Icon="edit" ButtonStyle="ButtonStyle.Info" />
-                                <RadzenButton Click="@(args => DeleteCar(data))" Icon="delete"  ButtonStyle="ButtonStyle.Danger" />
+                                <RadzenButton Click="@(args => DeleteCar(data))" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -44,17 +48,40 @@
     </div>
 </div>
 
+
 @code {
     IEnumerable<Car>? cars;
+    IEnumerable<Car>? filteredCars;
+    string searchText = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         cars = await GetAllCarsForGrid();
+        filteredCars = cars;
     }
 
     private async Task<IEnumerable<Car>> GetAllCarsForGrid()
     {
         return await CarService.GetAllAsync();
+    }
+
+    private async Task OnSearchChanged()
+    {
+        await ApplySearchFilter();
+    }
+
+    private async Task ApplySearchFilter()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            filteredCars = cars; 
+        }
+        else
+        {
+            filteredCars = cars?.Where(c => c.Make.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                             c.Engine.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+        }
+        StateHasChanged();
     }
 
     private async void EditCar(Car car)
@@ -95,7 +122,8 @@
 
     private async Task RefreshCars()
     {
-        cars = await GetAllCarsForGrid();
-        StateHasChanged(); //Notify the thing is updated
+        cars = await CarService.GetAllAsync();
+        await ApplySearchFilter();
     }
 }
+
